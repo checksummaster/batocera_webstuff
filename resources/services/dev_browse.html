@@ -1,0 +1,92 @@
+<html>
+    <style>
+        body {
+            background-color: black;
+        }
+        #system {
+            overflow: auto;
+            white-space: nowrap;
+        }
+        #game {
+            overflow: auto;
+            white-space: nowrap;
+        }
+        .marqueetext {
+            color :red;
+            text-shadow: 1ch;
+            font-size: 600%;
+
+        }
+        div {
+            color: white;
+        }
+
+    </style>
+    <script>
+
+        var makemarquee=(obj)=>{
+            var text = obj.fullname ?  obj.fullname : obj.name;
+            var src  = obj.logo ? obj.logo : obj.marquee ? obj.marquee : obj.image;
+
+            if (src) {
+                var image = document.createElement("img");
+                image.width = "300";
+                image.height = "100";                
+                image.src = src;
+                image.onerror = ()=>{
+                    image.src=obj.image;
+                };
+                image.alt = text;
+                return image;
+            } else {
+                var marquee = document.createElement("label");
+                marquee.classList.add('marqueetext')
+                marquee.innerHTML = text;
+                return marquee;
+            }            
+        }
+
+
+
+        (async()=>{
+            const system_list = await (await fetch(`systems`)).json();
+            for (var i = 0 ; i < system_list.length ; i++) {
+                var marquee = makemarquee(system_list[i]);
+                document.querySelector('#system').appendChild(marquee);
+                marquee._data = system_list[i];
+                
+                marquee.onclick = async (o)=>{
+                    document.querySelector('#system2').innerHTML = "<pre>" + JSON.stringify(o.target._data, null, 2) + "</pre>";
+                    
+                    document.querySelector('#game').innerHTML = "";
+                    document.querySelector('#game2').innerHTML = "";
+                    document.querySelector('#image').src = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
+                    document.querySelector('#video').src = "data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAAG21kYXQAAAGzABAHAAABthAAGBRgj237AAAC6m1vb3YAAABsbXZoZAAAAAB8JbCAfCWwgAAAA+gAAAAqAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAIVdHJhawAAAFx0a2hkAAAAD3wlsIB8JbCAAAAAAQAAAAAAAAAqAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAIAAAACAAAAAABsW1kaWEAAAAgbWRoZAAAAAB8JbCAfCWwgAAAXcAAAAPpVcQAAAAAAC1oZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAADFZpZGVvSGFuZGxlcgAAAVxtaW5mAAAAFHZtaGQAAAABAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAAEcc3RibAAAALhzdHNkAAAAAAAAAAEAAACobXA0dgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIAAgASAAAAEgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABj//wAAAFJlc2RzAAAAAANEAAEABDwgEQAAAAADDUAAAAAABS0AAAGwAQAAAbWJEwAAAQAAAAEgAMSNiu4FAEQBFGMAAAGyTGF2YzUyLjIwLjEGAQIAAAAYc3R0cwAAAAAAAAABAAAAAQAAA+kAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAAAEwAAAAEAAAAUc3RjbwAAAAAAAAABAAAALAAAAGF1ZHRhAAAAWW1ldGEAAAAAAAAAImhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAAACtpbHN0AAAAI6l0b28AAAAbZGF0YQAAAAEAAAAATAo=";
+                    var game_list = await (await fetch(`systems/${o.target._data.name}/games`)).json();
+
+                    
+
+                    for (var j = 0; j < game_list.length; j++) {
+                        var marquee = makemarquee(game_list[j]);                        
+                        document.querySelector('#game').appendChild(marquee);
+                        marquee._data = game_list[j];
+                        marquee.onclick = async (o)=>{
+                            document.querySelector('#game2').innerHTML = "<pre>" + JSON.stringify(o.target._data, null, 2) + "</pre>";
+                            document.querySelector('#image').src = o.target._data.image;
+                            document.querySelector('#video').src = o.target._data.video;
+                        }
+                    }
+                }                
+            }
+    })();
+
+    </script>
+    <body>
+        <div id="system"></div>
+        <div id="system2"></div>
+        <div id="game"></div>
+        <div id="game2"></div>
+        <image id="image"></image>
+        <video id='video' loop autoplay muted></video>            
+    </body>
+</html>

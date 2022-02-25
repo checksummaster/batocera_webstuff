@@ -1,0 +1,1 @@
+echo \{\"systemname\":\"$1\",\"gamename\":\"\"\} > /userdata/system/configs/emulationstation/resources/active_game.json

@@ -1,0 +1,54 @@
+<html>
+    <script>
+        var gamename = "null";
+        var systemname = "null";
+        var getgameinfo = async (active_game ) => {
+            var gamelist = await (await fetch(`systems/${active_game.systemname}/games`)).json();
+            return gamelist.filter(game => game.name === active_game.gamename)[0];
+        };        
+        var getsysteminfo = async (active_game ) => {            
+            return await (await fetch(`systems/${active_game.systemname}`)).json()
+        };
+        (async()=>{
+            setInterval(async () =>{
+                const active_game = await (await fetch('resources/active_game.json')).json();
+                if ( active_game.systemname != systemname) {
+                    systemname = active_game.systemname;
+                    var systeminfo = await getsysteminfo(active_game);
+                    document.querySelector('#system').src = `systems/${active_game.systemname}/logo`            
+                    document.querySelector('#systeminfo').innerHTML = JSON.stringify(systeminfo, null, 2);
+                }
+                if (active_game.gamename != gamename) {
+                    if (active_game.gamename != "" ) {
+                        gamename = active_game.gamename;
+                        var gameinfo = await getgameinfo(active_game);
+                        document.querySelector('#marquee').src = `systems/${active_game.systemname}/games/${gameinfo.id}/media/marquee`
+                        document.querySelector('#image').src = `systems/${active_game.systemname}/games/${gameinfo.id}/media/image`
+                        document.querySelector('#gameinfo').innerHTML = JSON.stringify(gameinfo, null, 2);
+                        document.querySelector('#video').src = `systems/${active_game.systemname}/games/${gameinfo.id}/media/video`
+                    } else {
+                        var gameinfo = {};
+                        document.querySelector('#marquee').src = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+                        document.querySelector('#image').src = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
+                        document.querySelector('#gameinfo').innerHTML = ""
+                        document.querySelector('#video').src = "data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAAG21kYXQAAAGzABAHAAABthAAGBRgj237AAAC6m1vb3YAAABsbXZoZAAAAAB8JbCAfCWwgAAAA+gAAAAqAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAIVdHJhawAAAFx0a2hkAAAAD3wlsIB8JbCAAAAAAQAAAAAAAAAqAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAIAAAACAAAAAABsW1kaWEAAAAgbWRoZAAAAAB8JbCAfCWwgAAAXcAAAAPpVcQAAAAAAC1oZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAADFZpZGVvSGFuZGxlcgAAAVxtaW5mAAAAFHZtaGQAAAABAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAAEcc3RibAAAALhzdHNkAAAAAAAAAAEAAACobXA0dgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIAAgASAAAAEgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABj//wAAAFJlc2RzAAAAAANEAAEABDwgEQAAAAADDUAAAAAABS0AAAGwAQAAAbWJEwAAAQAAAAEgAMSNiu4FAEQBFGMAAAGyTGF2YzUyLjIwLjEGAQIAAAAYc3R0cwAAAAAAAAABAAAAAQAAA+kAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAAAEwAAAAEAAAAUc3RjbwAAAAAAAAABAAAALAAAAGF1ZHRhAAAAWW1ldGEAAAAAAAAAImhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAAACtpbHN0AAAAI6l0b28AAAAbZGF0YQAAAAEAAAAATAo="
+                    }
+                }
+            }                            
+         ,500);
+    })();
+
+    </script>
+    <body>
+        <table>
+            <tr><td><h1>System</h1></td></tr>
+            <tr><td>marquee</td><td><image id='system'></image></td></tr>
+            <tr><td>info</td><td><pre id='systeminfo'></pre></td></tr>
+            <tr><td><h1>game</h1></td></tr>
+            <tr><td>marquee</td><td><image id='marquee'></image></td></tr>
+            <tr><td>image</td><td><image id='image'></image></td></tr>
+            <tr><td>video</td><td><video id='video' loop autoplay muted></video></td></tr>
+            <tr><td>info</td><td><pre id='gameinfo'></pre></td></tr>
+        </table>
+    </body>
+</html>
